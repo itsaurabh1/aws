@@ -1,3 +1,3 @@
-A simple Cloudformation template I created to demonstrate basics. 
-This template will give a simple example to create a S3 bucket with a parameter to enter the custom name and additional tag. 
-This will also show bucket name in output.
+Simple Cloudformation templates created to demonstrate basics of CloudFormation to make learning easy .
+
+Find details in my blog : http://getyouralgorithm.blogspot.com/2017/11/cloudformation-primer-for-aws-devops.html 
