@@ -14,7 +14,8 @@
 	     "Type" : "AWS::EC2::Instance" ,
 	     "Properties" : {
 	     "ImageId" : {"Fn::FindInMap" : ["AMIRegionMap" , {"Ref" : "AWS::Region"} , "AMI"] },
-	     "InstanceType" : "t2.micro"
+	     "InstanceType" : "t2.micro",
+	     "UserData" : {"Fn::Base64" : "yum upgrade -y"}
 	     				}
 	     		 }
 	     	},
