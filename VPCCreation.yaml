@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description : Deploy a VPC
+
+Resources:
+    MyVPC : 
+        Type: AWS::EC2::VPC
+        Properties:
+            CidrBlock: 10.0.0.0/16
+            EnableDnsHostnames: True
+            Tags:
+                - Key: Name
+                  Value: My VPC
+
+    MyInternetGateway:
+        Type: AWS::EC2::InternetGateway
+
+    AttachedGateway:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+            VpcId : !Ref MyVPC
+            InternetGatewayId : !Ref MyInternetGateway
+    
+    PublicSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId : !Ref MyVPC
+            CidrBlock: 10.0.1.0/24
+            AvailabilityZone: !Select
+                        - '0'
+                        - !GetAZs ''
+
+    PrivateSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref MyVPC
+            CidrBlock: 10.0.0.1/28
+            AvailabilityZone: !Select
+                    - '1'
+                    - !GetAZs ''
+                
+    MyPublicRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref MyVPC
+    
+    MyPublicRoute:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref MyPublicRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref MyInternetGateway
+        
+    PublicSubnetRouteTableAssociation1:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            SubnetId: !Ref PublicSubnet1
+            RouteTableId: !Ref MyPublicRouteTable
+            
+    MyPrivateRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref MyVPC      
+            
+    PrivateRouteTableAssociation1:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            SubnetId: !Ref PrivateSubnet1
+            RouteTableId: !Ref MyPrivateRouteTable
+    
+    MyPublicEC2:
+        Type: AWS::EC2::Instance
+        Properties:
+            ImageId: ami-2e64d954
+            SubnetId: !Ref PublicSubnet1
+        
+    MyPrivateEC2:
+        Type: AWS::EC2::Instance
+        Properties:
+            ImageId: ami-2e64d954
+            SubnetId: !Ref PrivateSubnet1
+            
+Outputs:
+    MyVPC:
+        Description: My VPC Name
+        Value: !Ref MyVPC
+    
+    PublicAZ1:
+        Description: My Public AZ
+        Value: !GetAtt
+            - PublicSubnet1
+            - AvailabilityZone
+            
+    PrivateAZ1:
+        Description: My Private AZ
+        Value: !GetAtt
+            - PrivateSubnet1
+            - AvailabilityZone
+    
+    PublicInstance:
+        Description: My public Web Server
+        Value: !Ref MyPublicEC2
+        
+    PrivateInstance:
+        Description: My Private DB Server
+        Value: !Ref MyPrivateEC2 
+    
+        
+            
+            
+                
+            
+                  
+            
